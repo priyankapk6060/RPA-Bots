@@ -1,0 +1,277 @@
+#--------------------------------------------------------------------------------------
+# Bot to extract data from Dealer Invoice
+# Written by : Milind T Kasture, Priyanka Kumari
+#            : Div. Mgr(MIS)     Intern Trainee (NIT Jaipur)
+#            : 03-Jun-2025
+# Updated on : 09-Jul 2025 (due to failure on certain cases)
+#            : Release Version V1
+#--------------------------------------------------------------------------------------
+#import packages
+#--------------------------------------------------------------------------------------
+import PyPDF2
+from PyPDF2 import PdfFileReader, PdfFileWriter
+
+import tkinter as tk
+from tkinter import filedialog, messagebox
+#-------------------------------------------------------------------------------------
+#   Class / Function Modules
+#-------------------------------------------------------------------------------------
+class InvoiceApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("PM e-Drive Invoice Data")
+        self.root.geometry("500x500")
+        self.file_path = ""
+        self.wname = ""
+        self.wson = ""
+        self.wphone = ""
+        self.wpancard = ""
+        self.wadhar = ""
+        self.wvinno = ""
+        self.winvno = ""
+        self.winvdate = ""
+        self.wamount = ""
+        
+
+        # Title label
+        tk.Label(root, text="PM e-Drive Invoice Data", font=("Arial", 16, "bold")).pack(pady=10)
+
+        # Select File Button
+        tk.Button(root, text="Select File", command=self.select_file).pack(pady=5)
+
+        # Frame for form fields
+        self.form_frame = tk.Frame(root)
+        self.form_frame.pack(pady=10)
+
+        self.fields = [
+            "Name",
+            "Son of",
+            "Phone Number",
+            "PAN card number",
+            "Aadhar card number",
+            "Chassis number",
+            "Invoice Number",
+            "Invoice Date",
+            "Invoice Amount"
+        ]
+
+        self.entries = {}
+
+        for field in self.fields:
+            row = tk.Frame(self.form_frame)
+            label = tk.Label(row, text=field + ": ", width=20, anchor='w')
+            entry = tk.Entry(row, width=30)
+            row.pack(pady=5, anchor='w')
+            label.pack(side=tk.LEFT)
+            entry.pack(side=tk.LEFT)
+            self.entries[field] = entry
+
+        # Run Button
+        tk.Button(root, text="RUN", command=self.run).pack(pady=20)
+
+    def select_file(self):
+        #--------------------------------------------------------------------------------------
+        # Clear existing screen
+        #--------------------------------------------------------------------------------------
+        dummy_data = {
+            "Name": "",
+            "Son of": "",
+            "Phone Number": "",
+            "PAN card number": "",
+            "Aadhar card number": "",
+            "Chassis number": "",
+            "Invoice Number": "",
+            "Invoice Date": "",
+            "Invoice Amount": ""
+        }
+
+        for field, entry in self.entries.items():
+            entry.delete(0, tk.END)
+            entry.insert(0, dummy_data.get(field, ""))
+        # Select filename 
+        self.file_path = filedialog.askopenfilename()
+        if self.file_path:
+            messagebox.showinfo("File Selected", f"Selected file:\n{self.file_path}")
+            
+
+    def run(self):
+        #--------------------------------------------------------------------------------------
+        # Start of Main Program
+        #--------------------------------------------------------------------------------------
+        wmes = ""
+        # open the pdf file
+        object = PyPDF2.PdfReader(self.file_path)
+
+        # # get number of pages
+        NumPages = len(object.pages)
+        #print(NumPages)
+
+
+        for page in range(0,NumPages,1):
+            wmes=''
+            page=object.pages[page]
+            text=page.extract_text()
+            rows = text.split('\n')
+            for i,row in enumerate(rows):
+                if row.startswith('Customer Name :'):
+                    wname=row.split(":")
+                    wname = wname[1]
+                    wname1 = wname.split("(")
+                    wsname = wname1[0]
+                    print(wsname)
+
+                if row.startswith('Institution Name:'):
+                    wname=row.split(":")
+                    wname=wname[1]
+                    wname1=wname.split("(")
+                    wsname = wname1[0]
+                    print(wsname)
+
+                if row.startswith('S/O | D/O | W/O :'):
+                    wname=row.split(":")
+                    wname=wname[1]
+                    wname1=wname.split("(")
+                    wson = wname1[0]
+                    print(wson)
+
+                if row.startswith('Phone :'):
+                    wname=row.split(":")
+                    wname=wname[1]
+                    wname1=wname.split("(")
+                    wphone = wname1[0]
+                    print(wphone)
+
+                if row.startswith('Customer Phone :'):
+                    wname=row.split(":")
+                    wname=wname[1]
+                    wname1=wname.split("(")
+                    wphone = wname1[0]
+                    print(wphone)
+
+                if row.startswith('Aadhar No :'):
+                    wname=row.split(":")
+                    wname=wname[1]
+                    wname1=wname.split("(")
+                    wadhar = wname1[0]
+                    print(wadhar)
+
+                if row.startswith('Customer Aadhar No :'):
+                    wname=row.split(":")
+                    wname=wname[1]
+                    wname1=wname.split("(")
+                    wadhar = wname1[0]
+                    print(wadhar)
+
+                if row.startswith('Pancard No :'):
+                    wname=row.split(":")
+                    wname=wname[1]
+                    wname1=wname.split("(")
+                    wpancard = wname1[0]
+                    print(wpancard)
+
+                if row.startswith('Customer Pancard No :'):
+                    wname=row.split(":")
+                    wname=wname[1]
+                    wname1=wname.split("(")
+                    wpancard = wname1[0]
+                    print(wpancard)
+
+                if row.startswith('Customer Pancard'):
+                    if i+1 < len(rows):
+                        wname = rows[i+1].split(":")
+                        wpancard = wname[1]
+                        print(wpancard)
+
+                if row.startswith('Address ::Invoice No. :'):
+                    wname=row.split("No. :")
+                    wname=wname[1]
+                    wname1=wname.split("(")
+                    winvno = wname1[0]
+                    print(winvno)
+                    
+                if row.startswith('Invoice No. :'):
+                    wname = row.split("No. :")
+                    winvno = wname[1]
+                    print(winvno)
+
+                if row.startswith('Invoice Date :'):
+                    wname=row.split(":")
+                    wname=wname[1]
+                    wname1=wname.split("(")
+                    winvdate = wname1[0]
+                    winvdate = winvdate.replace("/","-")
+                    print(winvdate)
+
+                if row.startswith('Chassis No. :'):
+                    wname=row.split(":")
+                    wname=wname[1]
+                    wname1=wname.split("(")
+                    wvinno = wname1[0]
+                    print(wvinno)
+
+                if row.startswith('AMOUNT IN WORDS'):
+                    wname=last_row
+                    wname1 = wname.rfind(" ")
+                    wamount = wname[wname1 + 1:]
+                    print(wamount)
+
+
+                last_row = row
+        #--------------------------------------------------------------------------------------
+        #   Assign extracted variables
+        #--------------------------------------------------------------------------------------
+        self.wname = wsname.upper()
+        self.wson = wson
+        self.wphone = wphone
+        self.wpancard = wpancard
+        self.wadhar = wadhar
+        self.wvinno = wvinno
+        self.winvno = winvno
+        self.winvdate = winvdate
+        self.wamount = wamount
+
+
+        dummy_data = {
+            "Name": self.wname,
+            "Son of": self.wson,
+            "Phone Number": self.wphone,
+            "PAN card number": self.wpancard,
+            "Aadhar card number": self.wadhar,
+            "Chassis number": self.wvinno,
+            "Invoice Number": self.winvno,
+            "Invoice Date": self.winvdate,
+            "Invoice Amount": self.wamount
+        }
+
+        #--------------------------------------------------------------------------------------
+        #   Display on screen
+        #--------------------------------------------------------------------------------------
+        for field, entry in self.entries.items():
+            entry.delete(0, tk.END)
+            entry.insert(0, dummy_data.get(field, ""))
+
+#--------------------------------------------------------------------------------------
+#   Other General Purpose Functions
+#--------------------------------------------------------------------------------------
+
+def left(s, amount):
+    return s[:amount]
+
+def right(s, amount):
+    return s[-amount:]
+
+def mid(s, offset, amount):
+    return s[offset:offset+amount]
+
+
+#--------------------------------------------------------------------------------------
+#   Start Routine
+#--------------------------------------------------------------------------------------
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = InvoiceApp(root)
+    root.mainloop()
+
+#--------------------------------------------------------------------------------------
+# End of code
+#--------------------------------------------------------------------------------------
